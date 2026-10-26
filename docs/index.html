@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 中转站推荐与评测：编程 / 长文任务的成本、限制、异常记录｜2026-10-26</title>
+<meta name="description" content="六家在用 AI 中转站的推荐与评测：按任务选型、算真实成本、核对请求是否真成功、异常时先查什么。含风险前置与异常记录。">
+<meta property="og:title" content="AI 中转站推荐与评测：编程 / 长文任务的成本、限制、异常记录">
+<meta property="og:description" content="按任务选型 · 算真实成本 · 核对请求是否真成功 · 异常处理边界">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://cw11ark.github.io/ai-relay-guide/">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--fg:#111827;--dim:#6b7280;--line:#e5e7eb;--acc:#2563eb;--ok:#059669;--warn:#d97706;--err:#dc2626}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1220;--card:#111a2b;--fg:#e8edf5;--dim:#8b98ac;--line:#1f2a3d;--acc:#5b9dff;--ok:#34d399;--warn:#fbbf24;--err:#f87171}}
+*{box-sizing:border-box}
+body{margin:0;padding:20px 16px 60px;background:var(--bg);color:var(--fg);font:15px/1.65 -apple-system,"PingFang SC","Segoe UI",sans-serif}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:25px;letter-spacing:-.02em;margin:0 0 2px}
+.sub{color:var(--dim);font-size:13px;margin-bottom:18px}
+.chip{display:inline-block;background:var(--acc);color:#fff;border-radius:5px;padding:1px 8px;font-size:12px;margin-left:6px;vertical-align:2px}
+.cta-row{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 22px}
+.btn{display:inline-block;background:var(--acc);color:#fff;text-decoration:none;border-radius:8px;padding:9px 18px;font-weight:600;font-size:14.5px}
+.btn:hover{filter:brightness(1.1)}
+.btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+h2{font-size:19px;margin:30px 0 10px}
+h3{font-size:16.5px;margin:0 0 8px}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13.5px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:rgba(127,127,127,.08)}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+code{background:rgba(127,127,127,.12);padding:1px 5px;border-radius:4px;font-size:13px}
+pre{background:rgba(127,127,127,.1);padding:10px 12px;border-radius:6px;overflow-x:auto;font-size:13px}
+.ok{color:var(--ok);font-weight:600}.warn{color:var(--warn);font-weight:600}.err{color:var(--err);font-weight:600}
+.hook{border-left:4px solid var(--acc);background:rgba(37,99,235,.06);padding:10px 14px;border-radius:6px;margin:10px 0 14px;font-weight:600}
+.hook.risk{border-color:var(--err);background:rgba(220,38,38,.06)}
+.fits{color:var(--dim);font-size:13.5px;margin:6px 0 10px}
+ul{margin:6px 0;padding-left:20px}
+li{margin:3px 0}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:1px 10px;font-size:12px;color:var(--dim);margin:2px 4px 2px 0}
+.tip{background:rgba(217,119,6,.08);border-left:3px solid var(--warn);padding:9px 13px;border-radius:5px;margin:10px 0;font-size:14px}
+.riskbox{background:rgba(220,38,38,.07);border-left:3px solid var(--err);padding:9px 13px;border-radius:5px;margin:10px 0;font-size:14px}
+details{margin:8px 0}
+summary{cursor:pointer;color:var(--acc);font-weight:600}
+footer{border-top:1px solid var(--line);margin-top:34px;padding-top:12px;color:var(--dim);font-size:12.5px}
+a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+.side{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 4px}
+.side a{font-size:13.5px;background:rgba(127,127,127,.1);padding:3px 10px;border-radius:6px}
+ol.qa{padding-left:22px}
+ol.qa li{margin:8px 0}
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>AI 中转站使用参考：编程与长文任务的成本、限制、异常记录<span class="chip">2026-10-22</span></h1>
+<div class="sub">六家在用 AI 中转站的<b>推荐与评测</b> · 按任务选型 + 算真实成本 + 异常处理边界 · 字段/行为观察 + 各站不同窗口的使用体感（<b>非标准化横评</b>，底层模型身份未独立证实）· <a href="#aff" style="color:var(--acc)">注册链接含返利邀请码</a></div>
+
+<!-- 🔴 风险绝对前置：在任何官网链接之前 -->
+<div class="card">
+<div class="hook risk">⚠️ 点击本文任何官网链接之前，先读这五条</div>
+<ol class="qa">
+<li><b>数据隐私</b>：中转站能看到你的全部请求内容。各家数据保存/日志政策<b>未经核验</b> ⇒ 无论条款写了什么，<b>密钥、客户数据、保密代码一律不要经过中转渠道</b>，先用脱敏样本试。</li>
+<li><b>模型身份未证实</b>：本文所有"模型校验"只做到"响应 model 字段与请求一致/不一致"的观察。中转方技术上可以改写字段 ⇒ <b>字段一致 ≠ 底层是原版模型</b>；正文型号一律按"渠道标称型号"理解。</li>
+<li><b>隐藏提示词注入</b>：AgentRouter 部分链路观察到附加兼容性指令，会改变应用原本的指令边界。对系统提示词敏感的工具（编程 Agent、JSON 结构化输出）可能受干扰——接入前先小流量验证。</li>
+<li><b>失败与计费</b>：429 = 被限流（重试要退避 + 上限，连发放大拥堵）；500/超时重试前先确认是否已扣费、任务是否幂等（重复执行可能重复扣费或重复副作用）。</li>
+<li><b>预扣费</b>：AgentRouter 观察到百万 token 级单发会按上限预扣约 $36（平台账面额度口径，释放规则因时而异）⇒ 大文档先小额分片试探，分片降低单次预扣但<b>不保证总成本更低</b>。</li>
+</ol>
+</div>
+
+<!-- 开始前定位 -->
+<div class="card">
+<h3>开始前，先回答三个问题</h3>
+<ol class="qa">
+<li><b>你真的需要 API 中转吗？</b> 中转站卖的是 API 额度，不是聊天会员——需要配客户端（Cherry Studio / ChatBox / Claude Code 等）或自己写代码调用。</li>
+<li><b>你跑什么任务？</b> 短问答、写代码、长文档分析，成本结构完全不同——<a href="#pricing">按任务算完账再看</a>。</li>
+<li><b>哪些渠道？</b> 看下面按任务导航，不要看总榜。</li>
+</ol>
+</div>
+
+<!-- 术语 + 算账 -->
+<h2 id="pricing">计费方式与算账方法</h2>
+<div class="card">
+<p><b>两个术语一句话</b>：</p>
+<ul>
+<li><b>Token</b>：模型计量文本的单位，1 个汉字 ≈ 1~2 token，token 数 ≠ 字数。</li>
+<li><b>按量 vs 按次</b>：按量 = 按 token 量计费（¥/百万 tokens，输入输出分开）；按次 = 每次请求固定费用。<b>两种方式没有普适的谁更省</b>——取决于每次请求的 token 量、上限和成功率。</li>
+</ul>
+<p><b>算账方法（示例，数字为假设）</b>：</p>
+<pre>假设输入 ¥1/M、输出 ¥2/M，每次请求 1 万输入 + 2 千输出 token：
+按量成本 = (10000/10⁶)×¥1 + (2000/10⁶)×¥2 = ¥0.014 / 次
+
+若某按次站报价 ¥0.0002/次（同模型、不超限）：
+此负载下按次约为按量的 1/70。</pre>
+<p>分界点思路：按量站的等效单次成本 = 输入token×输入单价 + 输出token×输出单价；<b>算出你这个负载的等效单次成本，再和按次报价比</b>，谁低用谁。</p>
+<div class="tip">⚠️ 以上全部是<b>假设数字的算术演示</b>，不是任何一家站的实际比价结论。另外按次站通常有上下文/输出上限（如 42K），超限的任务按次再便宜也用不了。</div>
+</div>
+
+<!-- 渠道对比 -->
+<h2>渠道对比（使用体感，观察窗口各不相同，非统一压测）</h2>
+<div class="tablewrap">
+<table>
+<tr><th>中转站</th><th>主打模型（渠道标称）</th><th>计费方式</th><th>起充值</th><th>观察窗口与体感</th></tr>
+<tr>
+ <td><b>AgentRouter</b></td>
+ <td>Claude / GPT / DeepSeek</td>
+ <td>按量，进出分开</td>
+ <td class="ok">0 元（签到领额度）</td>
+ <td>本人主力；观察期内高峰出现过 402（归因见点评）</td>
+</tr>
+<tr>
+ <td><b>VS 云</b></td>
+ <td>Gemini / GLM / MiniMax</td>
+ <td>按次 + 按量</td>
+ <td>小额可试</td>
+ <td>偶发 429；gemini 线有弹性上下线</td>
+</tr>
+<tr>
+ <td><b>Careke</b></td>
+ <td>Grok 4.6 / 4.7</td>
+ <td>分组定价（未记录具体报价）</td>
+ <td>小额可试</td>
+ <td>Grok 线约 7 天窗口内<b>未见故障公告</b>（≠ 无故障）</td>
+</tr>
+<tr>
+ <td><b>幻城</b></td>
+ <td>Qwen 免费 / step 推理</td>
+ <td>免费 + 按次</td>
+ <td class="ok">0 元起</td>
+ <td>免费档并发闸约 10 量级；429 属限流信号</td>
+</tr>
+<tr>
+ <td><b>小水管</b></td>
+ <td>GLM / MiniMax / 生图</td>
+ <td>按量，倍率档（基准未核验）</td>
+ <td>低价可试</td>
+ <td>夜间偶发 60s+ 慢请求；体感不掉线（非 SLA）</td>
+</tr>
+<tr>
+ <td><b>莱斯</b></td>
+ <td>推演专用（渠道标称）</td>
+ <td>多账号轮询</td>
+ <td>—</td>
+ <td>偶发上游 500，退避重试可恢复</td>
+</tr>
+</table>
+</div>
+<div class="sub">体感数据来自本人日常生产负载与故障日志复盘；各站观察窗口不同（见文末说明），未做多轮采样与分位数统计。</div>
+
+<!-- 报价记录 -->
+<h2>渠道标称型号与报价记录（只记录事实，不做跨口径比价）</h2>
+<div class="tip">💡 本表是<b>报价记录，不是比价排名</b>：各家计费单位不同（¥/M vs ¥/次 vs 倍率），倍率基准未核验 ⇒ <b>不能直接横向比大小</b>。要看哪家的账，用上面的算账方法代入。</div>
+<div class="tablewrap">
+<table>
+<tr><th>渠道标称型号</th><th>渠道</th><th>计费方式</th><th>记录到的报价（2026-10-18 快照）</th><th>备注</th></tr>
+<tr><td>deepseek-v4.1 / v4-flash</td><td>AgentRouter</td><td>按量（¥/M，进出分开）</td><td>输入 ¥0.8 / 输出 ¥1.6</td><td>官方公告口径</td></tr>
+<tr><td>deepseek（短请求）</td><td>VS 云</td><td>按次</td><td>约 ¥0.0002 / 次</td><td>上下文上限内</td></tr>
+<tr><td>gemini-3.8-flash（antigravity 线）</td><td>VS 云</td><td>按次</td><td>约 ¥0.002 / 次</td><td><span class="warn">观察到响应 model 字段与请求名不同</span>；底层是否不同未证实</td></tr>
+<tr><td>gemini-3.8-flash（api 线）</td><td>VS 云</td><td>按次</td><td>（同上量级）</td><td><span class="warn">两条线字段不同</span> ⇒ 比价/验收先对齐字段</td></tr>
+<tr><td>gemini-3.8-flash</td><td>AgentRouter</td><td>按量（¥/M，进出分开）</td><td>输入 ¥0.4 / 输出 ¥1.5</td><td>—</td></tr>
+<tr><td>claude sonnet / opus 系</td><td>AgentRouter</td><td>按量（¥/M，进出分开）</td><td>特惠组记录约 ¥7 / ¥35</td><td>折扣基准与适用型号未逐项核验 ⇒ 不折算"X 折"结论；百万级单发有预扣</td></tr>
+<tr><td>glm-5.3-flash</td><td>小水管</td><td>按量，倍率档</td><td><b>0.075 倍率（计费基准未核验）</b></td><td>425K 请求被受理 + 埋针抽查命中；<b>受理 ≠ 全文无截断</b></td></tr>
+<tr><td>grok-4.6 / 4.7</td><td>Careke</td><td>分组定价</td><td><b>未记录报价</b></td><td>须绑专属 Key，仅 OpenAI 协议（Anthropic 协议实测 500）</td></tr>
+<tr><td>step-5-preview</td><td>幻城</td><td>按次</td><td>约 ¥1.1 / 次（周配额）</td><td>—</td></tr>
+<tr><td>qwen3.8-flash-next</td><td>幻城</td><td>免费</td><td>0 元</td><td>并发闸；大上下文观察到 200 空正文</td></tr>
+<tr><td>gpt-6-astra（推演特化）</td><td>莱斯</td><td>多账号轮询</td><td>—</td><td>42K 单发上限；本人限定任务下体验良好</td></tr>
+</table>
+</div>
+
+<!-- 分站点评 -->
+<h2>分站点评（观察 + 边界）</h2>
+
+<div class="card">
+<div class="hook">AgentRouter —— 本人在用主力：渠道标称模型齐、更新快、签到领额度</div>
+<ul>
+<li>deepseek-v4 线稳定在用；claude 高价型号历史上出现过下架（503），用前实测</li>
+<li>按量计费、进出分开，账单流水可查</li>
+<li><b>GitHub 注册 + 每日签到领额度</b>，0 元起步</li>
+<li>观察到：高峰时段偶发 402/403，伴随本人账户余额/额度状态变化，补额后恢复。<b>402 的确切归因（账户余额 vs 全站额度）未证实</b>，只报告现象</li>
+</ul>
+<div class="riskbox">⚠️ 隐藏指令与预扣费（风险 3、5）在此渠道真实观察到——接入先小流量验证，大文档分片试探。</div>
+<div class="fits">适合场景：日常主力生产 · Claude Code 编程 · 签到轻度白嫖</div>
+</div>
+
+<div class="card">
+<div class="hook">VS 云 —— Gemini 系按次计费：高频轻任务的成本敏感选项之一</div>
+<table>
+<tr><th>模型线</th><th>小请求 TTFB（单发观察值）</th><th>字段校验观察</th></tr>
+<tr><td>gemini-3.8-flash-<b>antigravity</b></td><td>3.7s</td><td class="warn">请求 antigravity 线，响应字段为 flash-<b>high</b></td></tr>
+<tr><td>gemini-3.8-flash-<b>api</b></td><td>7.1s</td><td class="warn">请求 api 线，响应字段为 flash</td></tr>
+<tr><td>glm-5.3-flash</td><td>2.5s</td><td class="ok">字段一致</td></tr>
+</table>
+<ul>
+<li>gemini 按次约 ¥0.002；deepseek 按次约 ¥0.0002</li>
+<li>GLM / MiniMax / DeepSeek 备选齐全，单 Key 多模型</li>
+</ul>
+<div class="tip">⚠️ 两条线<b>响应字段不同</b>（字段观察；底层是否不同未证实）——比价/验收前先对齐字段。</div>
+<div class="fits">适合场景：高并发轻量任务 · 预算敏感 · Gemini 重度调用</div>
+</div>
+
+<div class="card">
+<div class="hook">Careke —— Grok 独立分组：本期记录中 Grok 的唯一在用渠道</div>
+<ul>
+<li>grok-4.6 / 4.7 独立分组；约 7 天观察窗口内未见故障公告（样本短，不支持更多结论）</li>
+<li>仅 OpenAI 协议（Anthropic 协议直打 500，实测）；Key 类型决定分组</li>
+</ul>
+<div class="fits">适合场景：需要 Grok 系模型时（稳定性边界见上表）</div>
+</div>
+
+<div class="card">
+<div class="hook">幻城 —— 零成本试水与推理特化</div>
+<ul>
+<li>Qwen3.8-Flash-Next <b>免费</b>（观察到并发闸约 10 量级——429 属限流，<b>退避几秒再试，不要连发</b>）</li>
+<li>step-5-preview 按次约 ¥1.1，有周配额</li>
+</ul>
+<div class="tip">⚠️ 免费档大上下文观察到 200 空正文——别拿它跑长文档。</div>
+<div class="fits">适合场景：零成本跑通流程 · 轻量验证 · 偶尔深度推理</div>
+</div>
+
+<div class="card">
+<div class="hook">小水管 —— GLM 长上下文低倍率档</div>
+<ul>
+<li>glm-5.3-flash 实测 425K token 请求被受理 + 多位置埋针抽查命中（<b>受理/命中 ≠ 全文无截断</b>；样本有限，关键任务自行加验）</li>
+<li>0.075 倍率档（<b>倍率基准与实付换算未核验</b> ⇒ 不做"同任务单价更低"的结论）</li>
+<li>夜间偶发 60s+ 慢请求，观察期内体感不掉线（非 SLA）</li>
+</ul>
+<div class="fits">适合场景：预算有限的长文档分析（带上 425K 的验证边界）</div>
+</div>
+
+<div class="card">
+<div class="hook">莱斯 —— 推演特化渠道（进阶场景）</div>
+<ul>
+<li>渠道标称 gpt-6-astra；42K token 单发硬闸（超限请求被拒，复现条件明确）</li>
+<li>偶发上游 500，退避重试；本人限定任务（结构化推演）下体验良好，其他能力未测</li>
+</ul>
+<div class="fits">适合场景：方案推演 · 复杂决策分析（42K 上限内）</div>
+</div>
+
+<!-- 按任务导航 -->
+<h2>选型导航（按任务，按你算出的账）</h2>
+<div class="card">
+<div class="side">
+<span class="tag">主力日用 / 编程 → AgentRouter（提示词敏感先小流量验证）</span>
+<span class="tag">大批量短请求 → 算等效单次成本，和 VS 云按次报价比</span>
+<span class="tag">要 Grok → Careke（本期唯一在用）</span>
+<span class="tag">零成本试水 → 幻城免费档</span>
+<span class="tag">长文档分析 → 小水管 GLM（注意验证边界）</span>
+<span class="tag">深度推演 → 莱斯（42K 上限内）</span>
+</div>
+</div>
+
+<!-- 试用步骤 -->
+<h2>小额试用步骤（第一次接入）</h2>
+<div class="card">
+<ol class="qa">
+<li><b>注册</b>：走官网注册（AgentRouter 可 GitHub 登录 + 签到领额度，0 元起步）。</li>
+<li><b>最小充值</b>：先充最低档（5~10 元量级），跑通再放量。</li>
+<li><b>发一条测试请求</b>：短问题，看响应 <code>model</code> 字段、扣额是否合理。</li>
+<li><b>对账</b>：核对扣费与报价是否一致、失败请求是否被扣费。</li>
+<li><b>小流量跑任务</b>：先跑不重要的任务验证质量，再决定是否当主力。</li>
+</ol>
+<p style="color:var(--dim);font-size:13.5px;margin:8px 0 0">⚠️ 试用期间密钥与敏感数据一律不过中转渠道（见开头风险 1）。</p>
+</div>
+
+<!-- CTA 收尾：风险读完、教育完毕后才出现 -->
+<div class="cta-row">
+  <a class="btn" href="https://agentrouter.org/register?aff=VqVt">AgentRouter 注册</a>
+  <a class="btn" href="https://vsllm.cc/register?aff=pcEs" style="background:#16a34a">VS 云注册</a>
+  <a class="btn" href="https://api.hcnsec.cn" style="background:#7c3aed">Careke 官网</a>
+</div>
+
+<footer>
+本文为个人在用渠道整理。🔴 <b>上方注册链接含返利邀请码</b>（AgentRouter / VS 云），走链接注册会给我们带来额度奖励，也会让你多拿一份注册额度——<b>排序与取舍不受佣金影响</b>，无返利的直达入口见各站分节。观察口径：字段/行为观察 + 各站不同窗口的使用体感 + 故障日志复盘；未做标准化压测与分位统计；底层模型身份未独立证实；倍率类计价基准未核验。数据快照 2026-10-18 · 价格随时变动，下单前以各站官方当日公告为准
+<details><summary>相关开源仓库</summary>
+<div class="side">
+<a href="https://github.com/cw11ark/jichang-tuijian-2026">机场推荐汇总</a>
+<a href="https://github.com/cw11ark/miaolianyun-jichang">秒连云测评</a>
+<a href="https://github.com/cw11ark/saiboyun-jichang">赛博云测评</a>
+<a href="https://github.com/cw11ark/peiqian-jichang">赔钱机场测评</a>
+</div>
+</details>
+</footer>
+
+</div></body>
+</html>
